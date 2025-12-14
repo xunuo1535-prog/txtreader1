@@ -87,6 +87,22 @@
       border: none;
       font-size: 16px;
     }
+    #floatingButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -110,6 +126,8 @@
     <div id="reader"></div>
   </div>
 
+  <div id="floatingButton">☰</div>
+
   <script>
     const reader = document.getElementById('reader');
     const sidebar = document.getElementById('sidebar');
@@ -117,6 +135,7 @@
     const bookmarksDiv = document.getElementById('bookmarks');
     const fileInput = document.getElementById('fileInput');
     const toolbar = document.getElementById('toolbar');
+    const floatingButton = document.getElementById('floatingButton');
 
     let bookKey = null;
     let chapters = [];
@@ -128,10 +147,21 @@
     // 工具栏收起
     document.getElementById('closeToolbar').onclick = () => { toolbar.style.display = 'none'; };
 
+    // 悬浮按钮显示功能
+    floatingButton.onclick = () => {
+      if (toolbar.style.display === 'none') {
+        toolbar.style.display = 'flex';
+      }
+      if (!sidebar.classList.contains('show')) {
+        sidebar.classList.add('show');
+      }
+    };
+
     // 文件读取
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
       if (!file) return;
+
       bookKey = 'book_' + file.name;
       const readerFile = new FileReader();
       readerFile.onload = e => {
