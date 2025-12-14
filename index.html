@@ -125,6 +125,9 @@
         generateTOC(text);
         restorePosition();
         loadBookmarks();
+
+        // 移动端加载后自动收起侧栏
+        sidebar.classList.remove('show');
       };
       readerFile.readAsText(file, 'utf-8');
     });
@@ -153,14 +156,13 @@
 
     /* ========== 滚动定位 ========== */
     function scrollToPos(pos) {
-      const text = reader.textContent.slice(0, pos);
-      const temp = document.createElement('span');
-      temp.textContent = text;
-      reader.innerHTML = '';
-      reader.appendChild(temp);
-      const offset = temp.getBoundingClientRect().height;
-      reader.textContent = reader.textContent + '';
-      reader.scrollTop = offset;
+      // 根据字符比例近似定位，避免破坏原文 DOM
+      const total = reader.scrollHeight - reader.clientHeight;
+      const ratio = pos / reader.textContent.length;
+      reader.scrollTop = total * ratio;
+
+      // 移动端自动收起目录
+      sidebar.classList.remove('show');
     }
 
     /* ========== 字体设置 ========== */
