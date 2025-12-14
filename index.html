@@ -50,6 +50,7 @@
       align-items: center;
       background: #f5f5f5;
       flex-wrap: wrap;
+      position: relative;
     }
     #reader {
       flex: 1;
@@ -77,6 +78,15 @@
       margin: 10px 0 5px;
       font-size: 15px;
     }
+    #closeToolbar {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -95,6 +105,7 @@
       字号 <input type="range" min="14" max="30" value="18" id="fontSize" />
       行距 <input type="range" min="1.2" max="3" step="0.1" value="1.8" id="lineHeight" />
       <button id="addBookmark">添加书签</button>
+      <button id="closeToolbar">收起工具栏 ✕</button>
     </div>
     <div id="reader"></div>
   </div>
@@ -105,19 +116,22 @@
     const toc = document.getElementById('toc');
     const bookmarksDiv = document.getElementById('bookmarks');
     const fileInput = document.getElementById('fileInput');
+    const toolbar = document.getElementById('toolbar');
 
     let bookKey = null;
     let chapters = [];
 
-    /* ========== 侧栏开关 ========== */
+    // 侧栏开关
     document.getElementById('toggleMenu').onclick = () => { sidebar.classList.add('show'); };
     document.getElementById('closeSidebar').onclick = () => { sidebar.classList.remove('show'); };
 
-    /* ========== 文件读取 ========== */
+    // 工具栏收起
+    document.getElementById('closeToolbar').onclick = () => { toolbar.style.display = 'none'; };
+
+    // 文件读取
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
       if (!file) return;
-
       bookKey = 'book_' + file.name;
       const readerFile = new FileReader();
       readerFile.onload = e => {
@@ -127,11 +141,12 @@
         restorePosition();
         loadBookmarks();
         sidebar.classList.remove('show');
+        toolbar.style.display = 'flex';
       };
       readerFile.readAsText(file, 'utf-8');
     });
 
-    /* ========== 目录生成（按常见章节格式） ========== */
+    // 目录生成
     function generateTOC(text) {
       toc.innerHTML = '';
       chapters = [];
@@ -143,7 +158,6 @@
         }
         pos += line.length + 1;
       });
-
       chapters.forEach(ch => {
         const div = document.createElement('div');
         div.className = 'chapter';
@@ -153,7 +167,6 @@
       });
     }
 
-    /* ========== 滚动定位 ========== */
     function scrollToPos(pos) {
       const total = reader.scrollHeight - reader.clientHeight;
       const ratio = pos / reader.textContent.length;
@@ -161,11 +174,11 @@
       sidebar.classList.remove('show');
     }
 
-    /* ========== 字体设置 ========== */
+    // 字体设置
     document.getElementById('fontSize').oninput = e => { reader.style.fontSize = e.target.value + 'px'; };
     document.getElementById('lineHeight').oninput = e => { reader.style.lineHeight = e.target.value; };
 
-    /* ========== 阅读进度保存 ========== */
+    // 阅读进度保存
     reader.addEventListener('scroll', () => {
       if (!bookKey) return;
       localStorage.setItem(bookKey + '_scroll', reader.scrollTop);
@@ -176,7 +189,7 @@
       if (pos) reader.scrollTop = Number(pos);
     }
 
-    /* ========== 书签功能 ========== */
+    // 书签功能
     document.getElementById('addBookmark').onclick = () => {
       if (!bookKey) return;
       const mark = { pos: reader.scrollTop, time: new Date().toLocaleString() };
