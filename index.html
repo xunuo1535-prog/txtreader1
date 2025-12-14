@@ -51,6 +51,7 @@
       background: #f5f5f5;
       flex-wrap: wrap;
       position: relative;
+      transition: transform 0.3s;
     }
     #reader {
       flex: 1;
@@ -118,10 +119,12 @@
   <div id="main">
     <div id="toolbar">
       <button id="toggleMenu">☰</button>
-      字号 <input type="range" min="14" max="30" value="18" id="fontSize" />
-      行距 <input type="range" min="1.2" max="3" step="0.1" value="1.8" id="lineHeight" />
-      <button id="addBookmark">添加书签</button>
-      <button id="closeToolbar">收起工具栏 ✕</button>
+      <div id="fontControls">
+        字号 <input type="range" min="14" max="30" value="18" id="fontSize" />
+        行距 <input type="range" min="1.2" max="3" step="0.1" value="1.8" id="lineHeight" />
+        <button id="addBookmark">添加书签</button>
+        <button id="closeFontControls">收起设置 ✕</button>
+      </div>
     </div>
     <div id="reader"></div>
   </div>
@@ -136,6 +139,8 @@
     const fileInput = document.getElementById('fileInput');
     const toolbar = document.getElementById('toolbar');
     const floatingButton = document.getElementById('floatingButton');
+    const fontControls = document.getElementById('fontControls');
+    const closeFontControls = document.getElementById('closeFontControls');
 
     let bookKey = null;
     let chapters = [];
@@ -144,17 +149,14 @@
     document.getElementById('toggleMenu').onclick = () => { sidebar.classList.add('show'); };
     document.getElementById('closeSidebar').onclick = () => { sidebar.classList.remove('show'); };
 
-    // 工具栏收起
-    document.getElementById('closeToolbar').onclick = () => { toolbar.style.display = 'none'; };
+    // 字号和行距设置收起
+    closeFontControls.onclick = () => { fontControls.style.display = 'none'; };
 
-    // 悬浮按钮显示功能
+    // 悬浮按钮显示工具栏和字体设置
     floatingButton.onclick = () => {
-      if (toolbar.style.display === 'none') {
-        toolbar.style.display = 'flex';
-      }
-      if (!sidebar.classList.contains('show')) {
-        sidebar.classList.add('show');
-      }
+      if (toolbar.style.display === 'none') toolbar.style.display = 'flex';
+      if (fontControls.style.display === 'none') fontControls.style.display = 'flex';
+      if (!sidebar.classList.contains('show')) sidebar.classList.add('show');
     };
 
     // 文件读取
@@ -172,6 +174,7 @@
         loadBookmarks();
         sidebar.classList.remove('show');
         toolbar.style.display = 'flex';
+        fontControls.style.display = 'flex';
       };
       readerFile.readAsText(file, 'utf-8');
     });
